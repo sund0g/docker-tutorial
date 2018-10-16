@@ -1,0 +1,33 @@
+# Lesson 53: Build a basic compose file for a multi-container service.
+# 
+# See README.md for objectives of this assignment.
+#
+# Note: when done with the containers, clean up the volumes as well,
+#     docker-composer down -v
+
+version: '3'
+
+services:
+  drupal:
+    image: drupal:latest
+
+    ports:
+      - '8080:80'
+    
+    volumes: # copied these from https://store.docker.com/images/drupal "Volumes" section
+      - drupal-modules:/var/www/html/modules
+      - drupal-profiles:/var/www/html/profiles
+      - drupal-sites:/var/www/html/sites
+      - drupal-themes:/var/www/html/themes
+
+  db:
+    image: postgres:latest
+    # getting pw variable from https://hub.docker.com/_/postgres/ doc
+    environment:
+      POSTGRES_PASSWORD: supersecretpw
+
+volumes: # The Drupal volumes need to be available to all services
+  drupal-modules:
+  drupal-profiles: 
+  drupal-sites:
+  drupal-themes:
