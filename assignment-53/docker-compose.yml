@@ -1,0 +1,40 @@
+# Assignment 53: Build a basic compose file for a multi-container service.
+# tasks:
+#   * Build a basic compose file for a Drupal contebt management system
+#      website. Docker Hub is your friend.
+#   * Use the drupal image along with the postgres image.
+#   * Use "ports" to expose Drupal on 8080 so you can localhost:8080
+#   * Be sure to set POSTGRES_PASSWORD for postgres.
+#   * Walk through Drupa setup via browser.
+#   * Tip: Drupal assumes DB is localhost, but it should be the service name.
+#   * Extra Credit: Use volumes to store Drupal unique data.
+#
+#   Note: when done with the containers, clean up the volumes as well,
+#     docker-composer down -v
+
+version: '3'
+
+services:
+  drupal:
+    image: drupal:latest
+
+    ports:
+      - '8080:80'
+    
+    volumes: # copied these from https://store.docker.com/images/drupal "Volumes" section
+      - drupal-modules:/var/www/html/modules
+      - drupal-profiles:/var/www/html/profiles
+      - drupal-sites:/var/www/html/sites
+      - drupal-themes:/var/www/html/themes
+
+  db:
+    image: postgres:latest
+    # getting pw variable from https://hub.docker.com/_/postgres/ doc
+    environment:
+      POSTGRES_PASSWORD: supersecretpw
+
+volumes: # The Drupal volumes need to be available to all services
+  drupal-modules:
+  drupal-profiles: 
+  drupal-sites:
+  drupal-themes:
