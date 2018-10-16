@@ -3,7 +3,7 @@
 > Goal: Create a compose config for a local Drupal CMS website
 
 - This empty directory is where you should create a docker-compose.yml 
-- Use the `drupal` image along with the `postgres` image
+- Use the [drupal](https://store.docker.com/images/drupal) image along with the [postgres](https://hub.docker.com/_/postgres/) image
 - Set the version to 2
 - Use `ports` to expose Drupal on 8080
 - Be sure to setup POSTGRES_PASSWORD on postgres image
