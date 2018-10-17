@@ -1,0 +1,38 @@
+# Lesson 56: Compose For Run-Time Image Building and Multi-Container 
+#            Development.
+#
+# See README.md for objectives of this assignment.
+
+version: '3'
+
+services:
+  drupal:
+    build:
+      context: .
+      dockerfile: drupal.Dockerfile
+    image: custom-drupal
+
+    ports:
+      - '8080:80'
+    
+    volumes: # copied these from https://store.docker.com/images/drupal "Volumes" section
+      - drupal-modules:/var/www/html/modules
+      - drupal-profiles:/var/www/html/profiles
+      - drupal-sites:/var/www/html/sites
+      - drupal-themes:/var/www/html/themes
+
+  db:
+    image: postgres:9.6
+    # getting pw variable from https://hub.docker.com/_/postgres/ doc
+    environment:
+      POSTGRES_PASSWORD: supersecretpw
+    
+    volumes:
+      - drupal-data:/var/lib/postgresql/data
+
+volumes: # The Drupal volumes need to be available to all services
+  drupal-modules:
+  drupal-profiles: 
+  drupal-sites:
+  drupal-themes:
+  drupal-data:
