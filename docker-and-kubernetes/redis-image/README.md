@@ -3,4 +3,4 @@
 The objectives for this section are,
 
 1. Understand the basics of a Dockerfile, how to create one, (using Redis as the example)
-2. Understaing and building images
+2. Understanding and building images
