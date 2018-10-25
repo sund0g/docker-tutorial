@@ -1,0 +1,24 @@
+version: '3'
+
+# "service" essentially means a type of "container" in the Docker universe
+services:
+
+  redis-server:
+    image: 'redis'
+
+  node-app:
+
+    # Adding automatic container restart as part of lesson 54.
+    restart: unless-stopped
+
+    # Look in the current directory for a Dockerfile
+    build: .
+
+    ports:
+      # '- in a yml file means an array
+      # Remember, port on the left of the : is the port on local machine,
+      # port on the right of the : is the port inside of the container.
+      #
+      # !!! NOTE: the container port must be the same port the app is 
+      # configured to listen on in index.js.
+      - "4001:8081"
