@@ -5,7 +5,7 @@ The objectives for this section are,
 1. Understand the basics of a docker-compose.yml file.
 2. Use docker to create a multi-container web app, using Node as the front end and Redis as the back end database.
 3. Understand how to configure the application and Docker such that the containers can communicate with each other.
-4. learn how to use use docker-compose to start and stop containers,
+4. Learn how to use docker-compose to start and stop containers,
 	
 		docker-compose up [-d]
 		
