@@ -16,3 +16,14 @@ services:
                           # include it when we built the image.
       - ./frontend:/app   # Map everything in "frontend" to "/app" inside the 
                           # container.
+  
+  tests:
+    build:
+      context: .
+      dockerfile: dev.Dockerfile
+      
+    volumes:
+      - /app/node_modules
+      - ./frontend:/app
+
+    command: ["npm", "run", "test"]
