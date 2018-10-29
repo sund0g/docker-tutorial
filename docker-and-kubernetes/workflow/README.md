@@ -2,7 +2,7 @@
 
 The objectives for this section are,
 
-1. Understand and create a product workflow from developer code check-in to production deployment, (using a React app as the example). The app will be what is dockerized for the workflow.
+1. Understand and create a product workflow from developer code check-in to production deployment, (using a React app as the example). The app will be what is dockerized for the workflow, (lessons 56-61).
 
 	The tools used to create the workflow are,
 	
@@ -10,11 +10,11 @@ The objectives for this section are,
 	* TravisCI
 	* AWS Elastic Beanstalk
 
-2. Learn how to tell Docker to build with non-standard Dockerfile names,
+2. Learn how to tell Docker to build with non-standard Dockerfile names (lesson 62),
 
 	e.g. `docker build -f dev.Dockerfile .`
 
-3. Learn to recognize container bloat and control it. When the React app was created, all the app dependencies were auto-generated in the **node_modules** subdirectory of "frontend". These are not needed in the container because it is built from the **node:alpine** image which already contains these dependencies, therefore, the **node_modules** directory can be deleted. If it was not deleted, the output of `docker build ...` would be something like,
+3. Learn to recognize container bloat and control it, (lesson 63). When the React app was created, all the app dependencies were auto-generated in the **node_modules** subdirectory of "frontend". These are not needed in the container because it is built from the **node:alpine** image which already contains these dependencies, therefore, the **node_modules** directory can be deleted. If it was not deleted, the output of `docker build ...` would be something like,
 
 		Sending build context to Docker daemon  238.7MB
 		...
@@ -23,23 +23,29 @@ The objectives for this section are,
 
 	>**It is best practice to always clean up directories before adding them to the container.** This will keep the size of the container from becoming unnecessarily large.
 
+4. Learn about **volumes** and how they can be used to update content without stopping/rebuilding/restarting containers, (lessons 66-67).
+
+5. Learn how to leverage **docker-compose.yml** to make starting and stopping the development environment more efficient, (lessons 68-70).
+
+6. Learn about testing, (lessons 71-73). Also an issue with testing and docker-compose using [docker attach](https://docs.docker.com/engine/reference/commandline/attach/), (lesson 74).
+
 ## Project-specific setup
 
 This lesson requires some additional setup as follows below. **NOTE:** The "frontend" directory is not checked into the repo because its contents will be created in [step 3](#3)
 
 1. Install [Nodejs](https://nodejs.org/) from either the website, (via download), or if on a Mac, via Brew 
 
-	`brew install node`
+		brew install node
 	
 2. Install [create-react-app](https://www.npmjs.com/package/create-react-app) which will be used to create the React app,
 
-	`npm install -g create-react-app`
+		npm install -g create-react-app
 	
 	(Additional info on create-react-app is [here](https://reactjs.org/docs/create-a-new-react-app.html))
 
 3. Create the app, (for details on the app, refer to the README.md in the "frontend" directory),
 
-	`create-react-app frontend`
+		create-react-app frontend
 	
 ## Starting the container
 This almost goes without saying, *but...*
