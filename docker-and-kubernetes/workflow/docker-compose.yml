@@ -1,0 +1,29 @@
+version: '3'
+
+services:
+  web:
+    build:
+      context: .          # Where we want the source for this image to be
+                          # pulled from.
+      dockerfile: dev.Dockerfile
+    ports:
+      - 3000:3000         # redirect traffic from 3000 outside to 3000 inside 
+                          # the container.
+    
+    volumes:
+      - /app/node_modules # "Bookmarking" this directory so we don't try to map
+                          # node_modules inside the container because we didn't
+                          # include it when we built the image.
+      - ./frontend:/app   # Map everything in "frontend" to "/app" inside the 
+                          # container.
+  
+  tests:
+    build:
+      context: .
+      dockerfile: dev.Dockerfile
+      
+    volumes:
+      - /app/node_modules
+      - ./frontend:/app
+
+    command: ["npm", "run", "test"]
