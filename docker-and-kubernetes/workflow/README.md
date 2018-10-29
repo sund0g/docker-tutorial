@@ -56,7 +56,7 @@ This lesson requires some additional setup as follows below. **NOTE:** The "fron
 ### For a Development environment
 Execute,
 
-	docker build -f dev.Dockerfile . -t sund0g/frontend
+	docker build -f dev.Dockerfile . -t <username>/frontend
 
 ### For a Production environment
 Execute,
