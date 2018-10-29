@@ -29,6 +29,10 @@ The objectives for this section are,
 
 6. Learn about testing, (lessons 71-73). Also an issue with testing and docker-compose using [docker attach](https://docs.docker.com/engine/reference/commandline/attach/), (lesson 74).
 
+7. Learn how to create a production-ready container using [nginx](https://www.nginx.com/), (lessons 75 and 78).
+
+8. Learn about [multi-stage builds](https://docs.docker.com/v17.09/engine/userguide/eng-image/multistage-build/#use-multi-stage-builds), (lessons 76 and 77).
+
 ## Project-specific setup
 
 This lesson requires some additional setup as follows below. **NOTE:** The "frontend" directory is not checked into the repo because its contents will be created in [step 3](#3)
@@ -46,8 +50,23 @@ This lesson requires some additional setup as follows below. **NOTE:** The "fron
 3. Create the app, (for details on the app, refer to the README.md in the "frontend" directory),
 
 		create-react-app frontend
+		
+## Building the containerized application
+
+### For a Development environment
+Execute,
+
+	docker build -f dev.Dockerfile . -t sund0g/frontend
+
+### For a Production environment
+Execute,
+	
+	docker build -f prod.Dockerfile . -t <username>/prod-frontend 
 	
 ## Starting the container
+
+### In a Development environment
+
 This almost goes without saying, *but...*
 
 When starting a container from the app image, with the command `docker run frontend` the log output will have something like, 
@@ -81,12 +100,22 @@ All that being said, **docker-compose.yml** has been created, (lessons 68 and 69
 To start the development environment, execute
 
 	docker-compose up
+	
+### In a production evironment
+
+By the end of Section 6, we have learned how to create a production-ready workflow using nginx as the web server to host the frontend application. To start the server, execute
+
+	docker run -p 8080:80 <username>/prod-frontend
+	
+The standard user port 8080 is used to forward traffic to the default nginx port 80.
 
 ## Stopping the container
 
-In the development environment (docker-compose), execute
+In the **development environment** (docker-compose), execute
 
 	docker-compose down
+	
+In a **production environment**, for now just **`CTRL-C`** to stop the container.
 
 
 
