@@ -25,7 +25,30 @@ The objectives for this section are,
 
 ## Project-specific setup
 
-This lesson requires some additional setup as follows,
+This lesson requires some additional setup as follows below. **NOTE:** The "frontend" directory is not checked into the repo because its contents will be created in [step 3](#3)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 1. Install [Nodejs](https://nodejs.org/) from either the website, (via download), or if on a Mac, via Brew 
 
