@@ -27,29 +27,6 @@ The objectives for this section are,
 
 This lesson requires some additional setup as follows below. **NOTE:** The "frontend" directory is not checked into the repo because its contents will be created in [step 3](#3)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 1. Install [Nodejs](https://nodejs.org/) from either the website, (via download), or if on a Mac, via Brew 
 
 	`brew install node`
@@ -88,6 +65,24 @@ This is because the **docker run** command did not expose any ports outside of t
 Remember the Docker CLI has to include the ports, e.g.
 
 	docker run -p 3000:3000 frontend
+
+Additionally, the volumes must also be added to the command, (lessons 66 and 67). The full command now looks like,
+
+	docker run -p 3000:3000 -v /app/node_modules -v $(pwd)/frontend:/app frontend
+	
+All that being said, **docker-compose.yml** has been created, (lessons 68 and 69) to make the development setup more efficient. Please refer to it for details.
+
+To start the development environment, execute
+
+	docker-compose up
+
+## Stopping the container
+
+In the development environment (docker-compose), execute
+
+	docker-compose down
+
+
 
 
 	
