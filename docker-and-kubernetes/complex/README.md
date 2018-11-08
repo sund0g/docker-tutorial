@@ -20,38 +20,27 @@ This lesson requires some additional setup as follows below. **NOTE:** we will b
 		create-react-app client
 >***Note: While we've followed along in lessons 99-107, to understand the architecture of the React application, the recommendation to download and use the tested client, server, and worker files has been followed.***
 
-## Building images for the Client, Server, and Worker components
+## Building and running the Client, Server, nginx, and Worker images components in development mode
 
-* to build the **client** image, cd to the client directory and execute,
+### To build the containers individually,
+
+* cd to the **client** directory and execute,
 
 		docker build -f dev.Dockerfile -t <username>/complex-client .
 		
-* to build the **server** image, cd to the server directory and execute,
+* cd to the **server** directory and execute,
 
-		docker build -f dev.Dockerfile -t <username>/complex-server .
+		docker build -f dev.Dockerfile -t <username>/complex-api .
 		
-* to build the **worker** image, cd to the worker directory and execute,
+* cd to the **worker** directory and execute,
 
 		docker build -f dev.Dockerfile -t <username>/complex-worker .
-		
-## Starting the containers
 
-### Individual container startup
+### Using docker-compose,
 
-* To start the **client**,
+* cd to the **complex** directory, (where **docker-compose.yml** is located) and execute,
 
-		docker container run <username>/complex-client
+		docker-compose up --build
 
-* To start the **server**,
-
-		docker container run <username>/complex-server
-
-* To start the **worker**,
-
-		docker container run <username>/complex-worker
-		
-### With docker-compose (development only)
-
-	docker-compose up
 
 
