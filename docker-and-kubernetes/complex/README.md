@@ -9,6 +9,7 @@ The objectives for sections 8 and 9 of the course are,
 5. Create a **Development-only** docker-compose file which will configure and start up the application containers, (lessons 113-115)
 6. Learn how to add environment variables to the docker-compose file.
 7. Learn a little about [nginx](https://www.nginx.com/) and how to use it for routing requests, (lessons 116-118).
+8. Troubleshoot errors, (lessons 120-122).
 
 ## Project-specific setup
 
