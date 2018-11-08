@@ -1,0 +1,69 @@
+version: '3'
+
+services:
+
+  postgres:
+    image: "postgres:latest"
+  
+  redis:
+    image: "redis:latest"
+
+  nginx:
+    restart: always       # while the other containers may die and not restart
+                          # it is critical that nginx always be running.
+     
+    build:
+      dockerfile: dev.Dockerfile
+      context: ./nginx
+    
+    ports:
+      - '3050:80'         # forward requests from 8080 to 80 in the container.
+    
+    depends_on:           # There is an error with nginx starting before the
+                          # client and api containers are up. depends_on makes
+                          # nginx wait until both are started.
+                          # https://www.udemy.com/docker-and-kubernetes-the-complete-guide/learn/v4/questions/5341554 
+      - client
+      - api
+
+  api:
+    build:
+      dockerfile: dev.Dockerfile
+      context: ./server
+
+    volumes:
+      # This configuration basically says anytime we look into the app folder,
+      # we will be redirected to the ./server folder with the exception of the
+      # node_modules directory.
+      - app/node_modules  # bookmarking so we don't override it.
+      - ./server:/app     # map everything from the server directory 
+                          # into the app folder.
+    
+    environment:
+      - REDIS_HOST=redis  # Docker enables us to just refer to the service.
+      - REDIS_PORT=6379   # This is the default Redis port.
+      - PGUSER=postgres   # service name from above
+      - PGHOST=postgres   # service name from above
+      - PGDATABASE=postgres # service name from above
+      - PGPASSWORD=postgres_password  # Default password.
+      - PGPORT=5432       # This is the default Postgres port.
+
+  client:
+    build:
+      dockerfile: dev.Dockerfile
+      context: ./client
+    
+    volumes:
+      - /app/node_modules  # bookmarking so we don't override it.
+      - ./client:/app     # map everything from the client directory 
+                          # into the app folder.
+
+  worker:
+    build:
+      dockerfile: dev.Dockerfile
+      context: ./worker
+    
+    volumes:
+      - app/node_modules  # bookmarking so we don't override it.
+      - ./worker:/app     # map everything from the worker directory 
+                          # into the app folder.
