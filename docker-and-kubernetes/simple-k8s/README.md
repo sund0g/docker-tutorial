@@ -1,19 +1,19 @@
 ## Section 12: Onwards to Kubernetes!
 
-####Lesson 154
+#### Lesson 154
 * Get an understanding of Kubernetes, **What** it is and **Why** would we want to use it.
 
-####Lesson 155
+#### Lesson 155
 * Learn when to use,
 	*  **[minikube](https://kubernetes.io/docs/setup/minikube/)** - for development
 	*  **[kubctl](https://kubernetes.io/docs/tasks/tools/install-kubectl/)** - for production 
 
-####Lesson 156
+#### Lesson 156
 * Install the k8s environment
 
 TODO: put in the details here
 
-####Lesson 157
+#### Lesson 157
 
 > **GOAL** Get the **multi-client** image running on the local k8s cluster as a container.
 > 
@@ -36,7 +36,7 @@ TODO: put in the details here
 	2. Create a config file to create the **container**
 	3. Create a config file to configure **networking**
 
-####Lesson 158
+#### Lesson 158
 
 1. Verify the **\<username\>/multi-client** image is on [Docker Hub](https://hub.docker.com/)
 
@@ -51,6 +51,6 @@ TODO: put in the details here
 
 	> This file contains the netowrking configuration for the container.
 
-####Lesson 159
+#### Lesson 159
 
 
