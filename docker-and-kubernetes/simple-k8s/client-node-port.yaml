@@ -1,0 +1,16 @@
+apiVersion: v1            # Specifies which objects are available for use
+kind: Service             # Defines the object to be created, i.e. networking
+metadata:
+  name: client-node-port 
+spec:
+  type: NodePort          # Service spec is type NodePort for dev only.
+  ports:
+    - port: 3050          # This is used by other pods that need access to
+                          # the client.
+      targetPort: 3000    # All incoming traffic is directed to this port
+                          # inside the pod. In this case, 3000 has been mapped
+                          # to the multi-client container in client-pod.yaml.
+      nodePort: 31515     # This is the port used to connect to the container
+                          # running inside the pod (development only).
+  selector:               # This maps to the label in client-pod.yaml
+    component: web
