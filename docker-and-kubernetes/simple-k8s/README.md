@@ -234,6 +234,6 @@ Two ways to deploy,
 	
 * K8s is far more restrictive and explicit than either **docker-compose** or **Elastic Beanstalk** with regards to how networking is configured.
 * As developers, we do not work directly with **nodes** in a **cluster**, we communicate changes to the **master** via **config files** and **kubectl** which then manages the nodes.
-* **Master** continuously monitors all the **nodes**. When is detects an object issue, it automatically attempts to recreate that object inside the node, until the list of **responsibilities** is satisfied.
+* **Master** continuously monitors all the **nodes**. When it detects an object issue, it automatically attempts to recreate that object inside the node, until the list of **responsibilities** is satisfied.
 	
 	> This is one of the most important ideas of k8s.
