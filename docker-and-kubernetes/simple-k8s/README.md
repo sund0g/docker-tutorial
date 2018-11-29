@@ -1,3 +1,10 @@
+### Table of Contents
+1. [Section 12: Onwards to Kubernetes!](#12)
+2. [Section 13: Maintaining Sets of Containers with Deployments](#13)
+
+-
+
+<a name="12"></a>
 ## Section 12: Onwards to Kubernetes!
 
 #### Lesson 154
@@ -237,3 +244,6 @@ Two ways to deploy,
 * **Master** continuously monitors all the **nodes**. When is detects an object issue, it automatically attempts to recreate that object inside the node, until the list of **responsibilities** is satisfied.
 	
 	> This is one of the most important ideas of k8s.
+
+<a name="13"></a>	
+## Section 13: Maintaining Sets of Containers with Deployments
