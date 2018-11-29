@@ -1,3 +1,5 @@
+[toc]
+
 ## Section 12: Onwards to Kubernetes!
 
 #### Lesson 154
