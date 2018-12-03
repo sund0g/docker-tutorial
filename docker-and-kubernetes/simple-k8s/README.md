@@ -2,7 +2,7 @@
 1. [Section 12: Onwards to Kubernetes!](#12)
 2. [Section 13: Maintaining Sets of Containers with Deployments](#13)
 
---
+---
 
 <a name="12"></a>
 ## Section 12: Onwards to Kubernetes!
@@ -250,7 +250,7 @@ Two ways to deploy,
 
 #### Lessons 165 & 166
 
-* It is recommneded to take a **Declarative** aproach when updating an existing object.
+* It is recommended to take a **Declarative** approach when updating an existing object.
 
 	> This will be the general recommendation any time a change is being made to the cluster.
 	
@@ -268,7 +268,7 @@ Two ways to deploy,
 	
 	1. Update **`client-pod.yaml`** changing **`image`** from **`\<username\>/multi-client`** to **`\<username\>/multi-worker`**
 
-		> Ensure that **minkube** is running before proceeding.
+		> Ensure that **minikube** is running before proceeding.
 		
 	2. Execute,
 			
@@ -285,7 +285,7 @@ Two ways to deploy,
 			
 	4. Review the **`Events`** section to see the container inside the pod was updated.
 
-	This proves that we successfully updated a container using the **Declarative** aproach, e.g. updating the **config file** only and letting k8s figure out what to do.
+	This proves that we successfully updated a container using the **Declarative** approach, e.g. updating the **config file** only and letting k8s figure out what to do.
 	
 #### Lesson 167
 
@@ -308,7 +308,7 @@ Two ways to deploy,
 	
 	The **`Deployment`** object **"maintains a set of identical pods ensuring they have the correct config and that the right number exists"**
 	
-	> **Deployment** and **Pod** objects are similar in that either can be used to to run containers contaning applications.
+	> **Deployment** and **Pod** objects are similar in that either can be used to to run containers containing applications.
 	
 This table compares/contrasts **Pods** and **Deployments**,
 
@@ -327,4 +327,5 @@ n/a | Monitors the state of each pod, updating as necessary
 > From this point forward, the course will use **Deployments** for both Development and Production examples.
 
 #### Lesson 169
+
 
