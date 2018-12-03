@@ -2,7 +2,7 @@
 1. [Section 12: Onwards to Kubernetes!](#12)
 2. [Section 13: Maintaining Sets of Containers with Deployments](#13)
 
--
+--
 
 <a name="12"></a>
 ## Section 12: Onwards to Kubernetes!
@@ -247,3 +247,84 @@ Two ways to deploy,
 
 <a name="13"></a>	
 ## Section 13: Maintaining Sets of Containers with Deployments
+
+#### Lessons 165 & 166
+
+* It is recommneded to take a **Declarative** aproach when updating an existing object.
+
+	> This will be the general recommendation any time a change is being made to the cluster.
+	
+* A pod's **unique identifiers** are,
+	* **Name**
+	* **Kind**
+
+	Usage of these identifiers determine whether the **master** will create a new pod or update an existing one,
+	
+	> Changing either of the identifiers in the config file results in master creating a new pod.
+	
+* An example of updating an existing pod will be to update the **`client-pod`** by replacing the **`multi-client`** container with a **`multi-worker`** container.
+
+	> the **multi-worker** service expects to have a **Redis** database available. We are not adding that for this example, and so there may be errors when we execute the update and restart the pod. This example only demonstrates how to update an existing pod.
+	
+	1. Update **`client-pod.yaml`** changing **`image`** from **`\<username\>/multi-client`** to **`\<username\>/multi-worker`**
+
+		> Ensure that **minkube** is running before proceeding.
+		
+	2. Execute,
+			
+			kubectl apply -f client-pod.yaml
+			
+		This should return a **`pod/client-pod configured`** message.
+	
+	3. To examine the container inside the pod, (we want to verify the container is using the multi-worker image) we learn the **`kubectl`** command,
+
+
+			kubectl describe <object type> <object name>, e.g.
+
+			kubectl describe pod client-pod
+			
+	4. Review the **`Events`** section to see the container inside the pod was updated.
+
+	This proves that we successfully updated a container using the **Declarative** aproach, e.g. updating the **config file** only and letting k8s figure out what to do.
+	
+#### Lesson 167
+
+* The four following configuration properties are the only ones we can change when updating a pod via a configuration file using the **Pod** object type,
+
+	* **spec.containers[\*].image**
+	* **spec.initContainers[\*].image**
+	* **spec.activeDeadlineSeconds**
+	* **spec.tolerations**
+
+	To create an example error demonstrating this, change the **`containerPort`** in **client-pod.yaml** from **3000** to **9999**.
+	
+	In the next lesson we'll learn how to create a configuration file where *any* pod property can be updated.
+
+#### Lesson 168
+
+* There are limits to what properties can be changed when using the **`Pod`** object type. To get around this, we use the **`Deployment`** object type.
+
+	> The full list of k8s objects are [here](https://kubernetes.io/docs/concepts/#kubernetes-objects)
+	
+	The **`Deployment`** object **"maintains a set of identical pods ensuring they have the correct config and that the right number exists"**
+	
+	> **Deployment** and **Pod** objects are similar in that either can be used to to run containers contaning applications.
+	
+This table compares/contrasts **Pods** and **Deployments**,
+
+Pod  | Deployment
+------------- | -------------
+Runs a single set of containers | Runs one or more sets of identical pods
+Good for one-off dev purposes | Good for dev purposes
+Rarely used in production | Good for production
+n/a | Monitors the state of each pod, updating as necessary
+
+* **Pods** are only used for running sets of very closely related containers having tight integration with each other.
+* They are not recommended for use in production because of the property restrictions exposed in the previous lesson.
+
+* **Deployments** will attempt to recreate and/or restart the containers if they crash.  When **updating**, they will attempt to update/restart before destroying the existing ones and creating new ones with the updates.
+ 
+> From this point forward, the course will use **Deployments** for both Development and Production examples.
+
+#### Lesson 169
+
