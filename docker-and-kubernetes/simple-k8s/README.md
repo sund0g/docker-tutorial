@@ -85,7 +85,7 @@ In **Lesson 156** we installed and played around a little but with **minikube**.
 
 	> The containers created as the **Multi-container** application in **Sections 10 & 11** are not tightly coupled, so for this course, we will only be running a single container in a pod.
 
-> refer to **client-pod-yaml** for additional comments.
+> Refer to **client-pod.yaml** for additional comments.
 
 #### Lesson 161
 
@@ -326,6 +326,99 @@ n/a | Monitors the state of each pod, updating as necessary
  
 > From this point forward, the course will use **Deployments** for both Development and Production examples.
 
-#### Lesson 169
+#### Lessons 169 & 170
+
+* Create a client **Deployment** configuration file, **client-deployment.yaml**
+
+> Refer to **client-deployment.yaml** for comments on the properties.
+
+#### Lesson 171
+
+> **Housekeeping tip:** Recall that in previous lessons there was a client pod deployed. It will be cleaned up before deploying the new Deployment
+
+1. To remove an object, execute the command,
+
+		kubectl delete -f <config file>, e.g.
+		
+		kubectl delete -f client-pod.yaml
+		
+	> This is an **Imperative** command, and is ok for existing object deletions to a cluster because currently there is really no other way to accomplish this task.
+	
+	> The process of a **Pod** being deleted is the same as a **container** being deleted by the **Docker CLI**. When a container is stopped/deleted, it is given 10 seconds to stop before being deleted. This same time interval happens with **kubectl delete**.
+	
+	Executing **`kubectl get pods`** should now return, **"No resources found."**
+
+2. To create the new **Deployment** execute,
+
+		kubectl apply -f client-deployment.yaml
+		
+		should return
+		
+		deployment.apps/client-deployment created
+
+3. To examine the Pod status execute,
+
+		kubectl get pods
+		
+		returns
+		
+		NAME                                READY   STATUS    RESTARTS   AGE
+		client-deployment-6dd64ffd7-984bx   1/1     Running   0          19h
+		
+4. to print out the status of the Deployment execute,
+
+		kubectl get deployment
+		
+		returns
+		
+		NAME                DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
+		client-deployment   1         1         1            1           19h
+		
+	* **DESIRED** reflects the number of **replicas** in client-deployment.yaml
+	* **CURRENT** is the current number of running pods
+	* **UP-TO-DATE** indicates the number of pods that are not synced with the config file.
+	* **AVAILABLE** shows the number of pods that are successfully running their containers.
+
+#### Lesson 172
+
+* To verify the **multi-client** container is running in the cluster.
+
+	> Remember, containers running in Pods managed by k8s are no longer accessed via **localhost**. Instead, we use the **IP** of the **node** and the **port** assigned to the **service/container** running inside the pod.
+
+	1. Get the ip address of the node by executing,
+	
+			minikube ip
+		
+	2. Get the **nodePort** associated with the container from **client-node-port.yaml** (**31515**)
+	3. Enter **`<ip address from minikube ip command>:3515`** in a browser window.
+
+	This should display the application.
+
+* Now is a great time to understand why **Service** objects are needed.
+
+	* To start, execute,
+	
+			kubectl get pods -o wide
+			
+			returns
+			
+			NAME                                READY   STATUS    RESTARTS   AGE   IP           NODE
+			client-deployment-6dd64ffd7-984bx   1/1     Running   0          2d    172.17.0.2   minikube 
+			
+		This adds two additional columns,
+			
+		* **IP** reflects the ip address of the pod.
+		* **NODE** is the name of the node in which the pod is running.
+
+	* ALL Pods get their own randomly assigned IP address.
+	* The address is internal to the minikube virtual machine.
+	* The address is internal to the minikube virtual machine.
+	* It is not accessible outside of the pod.
+	* The reason is that when the pod is deleted, updated, etc. it may well be assigned a new ip address.
+
+**This is where Service objects become useful for development; they use their Selectors to automatically route traffic to the associated pods. As pods come and go, the Service objects abstract the connectivity layer from us.**
+
+#### Lesson 173
+
 
 
