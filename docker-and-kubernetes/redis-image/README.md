@@ -1,4 +1,4 @@
-## Building Custom Images Through Docker Server
+## Section 3: Building Custom Images Through Docker Server
 
 The objectives for this section are,
 
