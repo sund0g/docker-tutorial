@@ -5,7 +5,6 @@
 ---
 
 <a name="12"></a>
-
 ## Section 12: Onwards to Kubernetes!
 
 #### Lesson 154
@@ -14,7 +13,7 @@
 #### Lesson 155
 * Learn when to use,
 	*  **[minikube](https://kubernetes.io/docs/setup/minikube/)** - for development
-	*  **[kubctl](https://kubernetes.io/docs/tasks/tools/install-kubectl/)** - for production 
+	*  **[kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/)** - for production 
 
 #### Lesson 156
 * Install the k8s environment
@@ -242,7 +241,7 @@ Two ways to deploy,
 	
 * K8s is far more restrictive and explicit than either **docker-compose** or **Elastic Beanstalk** with regards to how networking is configured.
 * As developers, we do not work directly with **nodes** in a **cluster**, we communicate changes to the **master** via **config files** and **kubectl** which then manages the nodes.
-* **Master** continuously monitors all the **nodes**. When it detects an object issue, it automatically attempts to recreate that object inside the node, until the list of **responsibilities** is satisfied.
+* **Master** continuously monitors all the **nodes**. When is detects an object issue, it automatically attempts to recreate that object inside the node, until the list of **responsibilities** is satisfied.
 	
 	> This is one of the most important ideas of k8s.
 
@@ -442,7 +441,7 @@ n/a | Monitors the state of each pod, updating as necessary
 			NAME                                 READY   STATUS    RESTARTS   AGE
 			client-deployment-65f586b878-9zw4r   1/1     Running   0          2m
 			
-		> k8s saw the port change to the **template** section of **client-deployment.yaml**, deleted the previous pod and recreated it rther than try to update it with the new port number.
+		> k8s saw the port change to the **template** section of **client-deployment.yaml**, deleted the previous pod and recreated it rather than try to update it with the new port number.
 		
 	3. To verify the port was changed, execute,
 
@@ -599,7 +598,7 @@ this should return something like,
 #### Lesson 180
 
 * Why would we need to access the version of Docker running in the cluster when the nodes are managed by k8s?
-	* Use the same Docker CLI **debugging** techiques
+	* Use the same Docker CLI **debugging** techniques
 	* Manually kill containers to **test** k8s' ability to self-heal
 	* **Delete** cached images in the node
 	* and more
@@ -640,4 +639,9 @@ this should return something like,
 
 		docker system prune -a
 			 
-> It is left to the the user to decide whether to use classic Docker or kubectl comands.
+> It is left to the the user to decide whether to use classic Docker or kubectl commands.
+
+
+
+
+
