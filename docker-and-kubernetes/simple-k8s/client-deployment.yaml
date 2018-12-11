@@ -1,0 +1,30 @@
+apiVersion: apps/v1         # The desired api version
+kind: Deployment            # The object type
+
+metadata:
+  name: client-deployment   # Name of the object
+
+spec:
+  replicas: 1               # Specifies the number of (identical) pods this
+                            # deployment is supposed to make.
+  selector:                 # Selector is essentially providing a handle to the
+                            # container label below.
+    matchLabels:
+      component: web
+
+  template:                 # Lists the configuration to be used for all pods
+                            # created by this deployment.
+    metadata:               # This metadata looks similar to the metadata
+                            # section in client-pod.yaml.
+      labels:
+        component: web      # The container label
+    spec:
+      containers:
+        - name: client
+          image: sund0g/multi-client
+          ports:
+            - containerPort: 3000
+
+
+
+

@@ -7,7 +7,8 @@ metadata:
 spec:
   containers:   # Contains an array of tightly coupled container objects.
     - name: client  # In this course, the pod will only contain one container.
-      image: sund0g/multi-client
+      image: sund0g/multi-worker  # changing this to multi-worker as part of 
+                                  # lesson 166.
       ports:
         - containerPort: 3000 # Exposed port for this container.
                               # 3000 is the port the client nginx server
