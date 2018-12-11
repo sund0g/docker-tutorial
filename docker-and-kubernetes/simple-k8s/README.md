@@ -1,6 +1,6 @@
 ### Table of Contents
-1. [Section 12: Onwards to Kubernetes!](#12)
-2. [Section 13: Maintaining Sets of Containers with Deployments](#13)
+* [Section 12: Onwards to Kubernetes!](#12)
+* [Section 13: Maintaining Sets of Containers with Deployments](#13)
 
 ---
 
@@ -352,7 +352,7 @@ n/a | Monitors the state of each pod, updating as necessary
 
 		kubectl apply -f client-deployment.yaml
 		
-		should return
+	should return
 		
 		deployment.apps/client-deployment created
 
@@ -360,7 +360,7 @@ n/a | Monitors the state of each pod, updating as necessary
 
 		kubectl get pods
 		
-		returns
+	returns
 		
 		NAME                                READY   STATUS    RESTARTS   AGE
 		client-deployment-6dd64ffd7-984bx   1/1     Running   0          19h
@@ -369,7 +369,7 @@ n/a | Monitors the state of each pod, updating as necessary
 
 		kubectl get deployment
 		
-		returns
+	returns
 		
 		NAME                DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
 		client-deployment   1         1         1            1           19h
@@ -400,7 +400,7 @@ n/a | Monitors the state of each pod, updating as necessary
 	
 			kubectl get pods -o wide
 			
-			returns
+		returns
 			
 			NAME                                READY   STATUS    RESTARTS   AGE   IP           NODE
 			client-deployment-6dd64ffd7-984bx   1/1     Running   0          2d    172.17.0.2   minikube 
@@ -420,5 +420,225 @@ n/a | Monitors the state of each pod, updating as necessary
 
 #### Lesson 173
 
+* Make changes to **client-deployment.yaml** and verify the pod(s) are updated.
 
+	1. Change **containerPort** from **3000** to **9999** save and execute,
+			
+			kubectl apply -f client-deployment.yaml
+			
+		returns
+			
+			deployment.apps/client-deployment configured
+	
+		> *configured* means a change was made to an existing deployment.
+	
+	2. Execute,
+		
+			kubectl get pods
+			
+		returns
+			
+			NAME                                 READY   STATUS    RESTARTS   AGE
+			client-deployment-65f586b878-9zw4r   1/1     Running   0          2m
+			
+		> k8s saw the port change to the **template** section of **client-deployment.yaml**, deleted the previous pod and recreated it rther than try to update it with the new port number.
+		
+	3. To verify the port was changed, execute,
 
+			kubectl describe pod client-deployment-65f586b878-9zw4r
+			
+		returns the long-form description of the pod with the port change
+			
+			...
+			
+			Port:           9999/TCP
+
+			...
+		
+		> The pod name is optional. Can use **pods** to return information of all pods.
+	
+	4. Change the number of **replicas** from **1** to **5** save and execute,
+			
+			kubectl apply -f client-deployment.yaml
+	5. Then execute,
+	
+			kubectl get pods
+			
+		returns
+			
+			NAME                                 READY   STATUS              RESTARTS   AGE
+			client-deployment-65f586b878-2spzw   0/1     ContainerCreating   0          1s
+			client-deployment-65f586b878-67p7k   0/1     ContainerCreating   0          1s
+			client-deployment-65f586b878-9zw4r   1/1     Running             0          16m
+			client-deployment-65f586b878-hb5h2   0/1     ContainerCreating   0          1s
+			client-deployment-65f586b878-wldgq   0/1     ContainerCreating   0          1s
+			
+	
+		> This means there are 5 containers running in separate pods.
+		
+		> **REMEMBER** the number of replicas is the number of **pods** to be maintained
+		
+	6. Finally, change the **image** from **\<username\>/multi-client** to **\<username\>/multi-worker** save and execute,
+	
+			kubectl apply -f client-deployment.yaml
+
+	7. ASAP after step 6, execute,
+		
+			kubectl get deployments
+			
+		returns
+			
+			NAME                DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
+			client-deployment   5         7         3            4           3d
+
+		* DESIRED is **5** because that's the number of replicas
+		* CURRENT is **7** (at the moment the command was executed) ans is the **total** number of pods running. Subtracting the number of AVAILABLE pods tells us that there are **3** pods that re old and need to be deleted, (kubectl does this automatically).
+		* UP-TO-DATE is **3** meaning 3 of the 5 pods have been updated
+		* AVAILABLE is **4** meaning 4 of 5 pods are available.
+	
+		Executing `kubectl get deployments` again returns,
+		
+			NAME                DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
+			client-deployment   5         5         5            5           3d
+		
+		This means that kubectl completed the updates and we have the DESIRED number of pods running.
+		
+#### Lessons 174 - 176
+
+* How is a deployment updated when a new version of an image becomes available?
+
+	> Before continuing, revert the changes to **client-deployment.yaml**
+
+1. Switch the deployment use the multi-client image again.
+	
+	* Save the reverted changes to **client-deployment.yaml** and execute,
+	
+			kubectl apply -f client-deployment.yaml
+
+	* Execute `minikube ip` to get the ip of the newly created pod.
+	* Enter **\<k8s cluster ip\>:31515** into a browser window to verify we can access the client.
+
+2. Update the multi-client image, rebuild, and push it to [Docker Hub](https://hub.docker.com/).
+	
+	* Open **.../client/src/App.js** in an editor.
+	* Change `App-title` to something else, (dealer's choice) and save.
+	* In the **client** directory build the image with the change,
+	
+			docker build -f prod.Dockerfile -t <username>/multi-client .
+	* Push the new image to [Docker Hub](https://hub.docker.com/),
+	
+			docker push <username>/multi-client
+3.  Get the deployment to recreate pods with the latest multi-client image.
+
+	> At this point, there is no easy way to do this with k8s, see [k8s GitHub issue #33664](https://github.com/kubernetes/kubernetes/issues/33664). The reason is that is nothing in the k8s config file syntax that provides a way to recognize an image update.
+	
+	
+	We will examine three ways to solve this problem.
+	
+	* Manually delete pods so the deployment will recreate them, (pulling the latest image) **This is not scalable**.
+	* Tag images with a version and include version in the config file. **Adds an extra step in the deployment process**.
+	* Use an **imperative** command to update the image version the deployment should use. **Uses an imperative command**. 
+
+		> The third solution is what we will implement. It may not be the best, but it is reasonable.
+		
+	1. Tag the multi-client image with a version and push to Docker Hub.
+		* From the **multi-docker** client directory, execute,
+		
+				docker build -f prod.Dockerfile -t <username>/multi-client:v2 .
+				
+			> Alternatively just add the tag without rebuilding the full image.
+			
+			and
+				
+				docker push <username>/multi-client:v2
+			 
+	2. Execute **kubectl** forcing the deployment to use the new image version,
+
+			kubectl set image deployment/client-deployment client=<username>/multi-client:v2
+			
+		returns
+		
+			deployment.extensions/client-deployment image updated
+			
+		> To verify the update we can check the status of the pod, `kubectl get pods` as well as checking the update in the browser, (via `minikube ip`:31515)
+		
+* This may seem very complicated, and it is to a degree. When this process is productized it will all be automated in a script and thus become very easy.
+
+#### Lessons 178 & 179
+
+* Recall there are **TWO** versions of Docker running on your machine,
+
+	1. The version that is running on the **minikube node**
+	2. The version that was installed on the local computer.
+
+* The Docker client on the local machine by default is configured to communicate with the Docker server also installed on the local machine.
+
+* The local docker client can be configured in the **terminal window** to communicate with the version of the Docker server installed on a node in the k8s cluster. To do this execute,
+
+		eval $(minikube docker-env)
+
+> **This only works for the terminal window in which the command was executed.** 
+			
+* To see what specifically is being set by the *eval* bash command, execute,
+
+		minikube docker-env
+this should return something like,
+
+		export DOCKER_TLS_VERIFY="1"
+		export DOCKER_HOST="tcp://xxx.xxx.xxx.xxx:2376"
+		export DOCKER_CERT_PATH="/Users/<user>/.minikube/certs"
+		export DOCKER_API_VERSION="1.35"
+		# Run this command to configure your shell:
+		# eval $(minikube docker-env)
+
+* Anytime the **Docker CLI** is invoked, (e.g. `docker ps`) it first looks at the **docker-env** to get the information it needs to execute a command.
+
+> The **DOCKER_HOST** variable contains the ip address of the minikube server. This can be verified by executing `minikube ip` and comparing the two.
+
+#### Lesson 180
+
+* Why would we need to access the version of Docker running in the cluster when the nodes are managed by k8s?
+	* Use the same Docker CLI **debugging** techiques
+	* Manually kill containers to **test** k8s' ability to self-heal
+	* **Delete** cached images in the node
+	* and more
+
+* As an example, to get the **command line** of a container, execute,
+
+		docker ps
+		
+	This returns a bunch of k8s/Docker information. Looking at the top of the results should show something like,
+	
+		CONTAINER ID        IMAGE                        COMMAND                  CREATED             STATUS              PORTS               NAMES
+		ecd46e15dd38        sund0g/multi-client          "nginx -g 'daemon of…"   5 seconds ago       Up 4 seconds                            k8s_client_client-deployment-789958dc67-qmsq7_default_574847cb-fa69-11e8-b1d5-080027
+		
+* Copy the **Container ID** and execute,
+
+		docker exec -it <container ID> /bin/sh
+		
+	which puts us in in the container so we can do normal Docker debugging on the container.
+	
+	> Most of the Docker commands are available via **kubectl**
+	
+* To get to the **container command line** via **kubectl**,
+
+	1. Execute,
+			
+			kubectl get pods
+		
+		this returns,
+		
+			NAME                                 READY   STATUS    RESTARTS   AGE
+			client-deployment-789958dc67-qmsq7   1/1     Running   1          3d
+			
+	2. Copy the **NAME** of the pod and execute,
+
+			kubectl exec -it <NAME> /bin/sh
+			
+* If an **image caching** issue is suspected, (k8s is not updating newer images), the classic Docker command **prune** could be used as a potential solution e.g.
+
+		docker system prune -a
+			 
+> It is left to the the user to decide whether to use classic Docker or kubectl comands.
+
+	
