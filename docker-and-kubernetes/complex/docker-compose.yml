@@ -3,22 +3,22 @@ version: '3'
 services:
 
   postgres:
-    image: "postgres:latest"
-  
+    image: 'postgres:latest'
+
   redis:
-    image: "redis:latest"
+    image: 'redis:latest'
 
   nginx:
     restart: always       # while the other containers may die and not restart
                           # it is critical that nginx always be running.
-     
+    
     build:
       dockerfile: dev.Dockerfile
       context: ./nginx
     
     ports:
       - '3050:80'         # forward requests from 8080 to 80 in the container.
-    
+  
     depends_on:           # There is an error with nginx starting before the
                           # client and api containers are up. depends_on makes
                           # nginx wait until both are started.
@@ -30,12 +30,12 @@ services:
     build:
       dockerfile: dev.Dockerfile
       context: ./server
-
+    
     volumes:
       # This configuration basically says anytime we look into the app folder,
       # we will be redirected to the ./server folder with the exception of the
       # node_modules directory.
-      - app/node_modules  # bookmarking so we don't override it.
+      - /app/node_modules # bookmarking so we don't override it.
       - ./server:/app     # map everything from the server directory 
                           # into the app folder.
     
@@ -47,23 +47,27 @@ services:
       - PGDATABASE=postgres # service name from above
       - PGPASSWORD=postgres_password  # Default password.
       - PGPORT=5432       # This is the default Postgres port.
-
+  
   client:
     build:
       dockerfile: dev.Dockerfile
       context: ./client
-    
+
     volumes:
-      - /app/node_modules  # bookmarking so we don't override it.
+      - /app/node_modules # bookmarking so we don't override it.
       - ./client:/app     # map everything from the client directory 
                           # into the app folder.
-
+ 
   worker:
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    
     build:
       dockerfile: dev.Dockerfile
       context: ./worker
     
     volumes:
-      - app/node_modules  # bookmarking so we don't override it.
+      - /app/node_modules # bookmarking so we don't override it.
       - ./worker:/app     # map everything from the worker directory 
                           # into the app folder.
