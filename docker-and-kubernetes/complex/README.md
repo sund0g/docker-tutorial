@@ -64,6 +64,16 @@ This lesson requires some additional setup as follows below. **NOTE:** we will b
 
 The objective for this section is to get the **Complex App** running in a **Production** environment.
 
+The architecture will look like,
+
+* 3 **client** pods
+* 3 **server** pods
+* 1 **worker** pod
+* 1 **Redis** pod
+* 1 **Postgres** pod
+* 1 **Postgres** PVC
+* **Traffic/routing** will be managed by an **Ingress** server and **Cluster IP Service**
+
 #### Lesson 181
 
 * This section introduces some new terms,
@@ -99,7 +109,50 @@ The objective for this section is to get the **Complex App** running in a **Prod
 		
 	> Remember when we did this originally the first time **docker-compose up** was executed, there were errors and **nginx** continuously stopped/restarted.
 	
-	> To fix this, \^C to stop **docker-compose** and immediately rerun **docker-compose up** w/o the **--build** flag.
+	> If this happens, \^C to stop **docker-compose** and immediately rerun **docker-compose up** w/o the **--build** flag.
+	
+	> In a later lesson, we added the **`depends_on`** section for the **nginx** service in **docker-compose.yml** to solve this issue.
 	
 3. Navigate, (in a browser window) to **localhost:3050** to verify the application works as expected.
 	
+#### Lesson 184
+
+* Before starting to migrate the **complex** application to kubernetes, delete the following from the **complex** directory,
+
+	* **docker-compose.yml**
+	* the **nginx** directory
+
+	> The **travis.yml** and **dockerrun.aws.json** from **Section 7** are not here because I skipped that part of the course. When I go back and complete the section everything will be in **complex-elastic-beanstalk**.
+	
+* Now start the creation of the **k8s** configuration.
+
+	1. Create a **k8s** subdir in the **complex** dir
+	2. Create **client-deployment.yaml** in the **k8s** directory
+
+	> Review the contents of the **client-deployment.yaml** for details on how the deployment is configured.
+
+#### Lessons 185 & 186
+
+* What is a **ClusterIP** service and how does it differ from a **nodePort** service?
+
+> Remember, a **service** is used any time we want to set up some kind of networking for an **object** such as a **pod**.
+
+* **nodePort**,
+	* is used for **development** purposes **only**
+	* exposes **pods** to the outside world
+	* requires a **port** and **tagetPort** but not **nodePort**
+
+* **ClusterIP**,
+	* exposes a set of **pods** to other **objects** in the **cluster**
+	* does **not** allow access from the outside world.
+
+> In general, a **ClusterIP** service is used when **objects** need to be accessed only by other **objects** in the **cluster**.
+
+> An **Ingress** service is used for **Objects** in the cluster that need to be accessible to the **outside world**. More on this in subsequent lessons.
+
+1. Create **client-cluster-ip-service.yaml** in the **k8s** directory.
+
+> Review the contents of the **client-cluster-ip-service.yaml** for details on how the service is configured.
+
+#### Lesson 187
+
