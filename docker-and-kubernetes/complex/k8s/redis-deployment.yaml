@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-deployment
+spec:                   # Specify how the deployment behaves.
+  replicas: 1           # Not providing Redis cluster HA in this course.
+  selector:
+    matchLabels:
+      component: redis
+  template:             # Pod template
+    metadata:
+      labels:
+        component: redis
+    spec:               # Pod sepcifications
+      containers:
+        - name: redis
+          image: redis  # Pulling the one from Docker Hub.
+          ports:
+            - containerPort: 6379 # Not changing the default port. 

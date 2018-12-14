@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: worker-deployment
+spec:
+  replicas: 1       # Starting out with a single pod. This is to demonstrate
+                    # how to scale a pod at a later time.
+                    #
+                    # Remember, this pods does all the work of computing the
+                    # Fibonacci number; it is the slowest part of the system.
+  selector:
+    matchLabels:
+      component: worker
+  template:
+    metadata:
+      labels:
+        component: worker
+    spec:           # What this pod is running
+      containers:
+        - name: worker
+          image: sund0g/multi-worker
+
+# There are no ports or services associated with the worker because 
+# there are no outside requests routing to it.

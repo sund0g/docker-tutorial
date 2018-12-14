@@ -156,3 +156,207 @@ The architecture will look like,
 
 #### Lesson 187
 
+* Before creating the additional configuration files, the existing ones will be tested to ensure they are correct.
+* This will be done by loading both configurations into the cluster via **kubectl**.
+
+-
+
+* Before doing this, delete the deployment created in previous lessons as follows,
+
+		kubectl get pods
+		
+	to get the name of the old deployment *client-deployment*, then
+	
+		kubectl delete deployment client-deployment
+		
+	should return
+	
+		deployment.extensions "client-deployment" deleted
+		
+	> Executing **kubectl get deployments** again should return **No resources found** verifying the deployment was deleted.
+	
+* Also delete the service that was created to provide network services to the deployment as follows,
+
+		kubectl get services
+		
+	to get the name of the network service *client-node-port*, then
+	
+		kubectl delete service client-node-port
+		
+	should return
+	
+		service "client-node-port" deleted
+		
+	> Executing **kubectl get services** should return only the kubernetes service which is required for kubernetes to run on the system.
+
+-
+
+Once everything is cleaned up, deploy the configuration files by executing,
+
+		kubectl apply -f k8s
+		
+> Each configuration file *could* be listed in the apply; having all the configuration files in the same directory allows the shortcut used above.
+
+should return
+
+	service/client-cluster-ip-service created
+	deployment.apps/client-deployment created
+	
+To see the details of the deployment,
+
+	kubectl get deployment
+	
+should return
+
+	NAME                DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
+	client-deployment   3         3         3            3           1h
+
+> Remember, there are 3 pods because we set **replicas: 3** in **client-deployment.yaml**
+
+	kubectl get pods
+	
+should return
+
+	 NAME                                READY   STATUS    RESTARTS   AGE
+	client-deployment-6dd64ffd7-24bgn   1/1     Running   0          1h
+	client-deployment-6dd64ffd7-f258j   1/1     Running   0          1h
+	client-deployment-6dd64ffd7-mtmsm   1/1     Running   0          1h
+
+and finally,
+
+	kubectl get services
+	
+should return
+	
+	NAME                        TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)    AGE
+	client-cluster-ip-service   ClusterIP   10.96.45.139   <none>        3000/TCP   1h
+
+### Takeaway
+---
+
+* Because there will be 11-12 configuration files to manage, using the **kubectl apply -f k8s** shortcut will save quite a bit of time in the following lessons.
+
+---
+
+#### Lessons 188 & 189
+
+Create the **Express API/multi-server** and associated **ClusterIP** service configuration files,
+
+* **server-deployment.yaml**
+* **server-cluster-ip-service.yaml**
+
+> Review the contents of the **server-deployment.yaml** and **server-cluster-ip-service.yaml** for details on how the service is configured.
+
+> Remember port 5000 was hardcoded into the server **index.js** file,
+
+> app.listen(5000, err => {
+  console.log('Listening');
+});
+
+> This has to be included in the **ClusterIP** service.
+
+#### Lesson 190
+
+> The objective of this lesson is to learn an alternative way of managing configuration files by merging them into a single file as it makes sense.
+
+* Combining multiple configuration files is dead simple, just copy the contents of the files into a single file and separate the configs with a, 
+
+		---
+		
+	However, this may be a bit confusing for maintenance. It is left to personal preference as to which model to follow. I am fiollowing the **keep everything in separate files** model as presented in the course
+
+#### Lesson 191
+
+Create the **worker-deployment.yaml** configuration.
+
+> Review the contents of the **worker-deployment.yaml** for details on how the service is configured.
+
+#### Lesson 192
+
+* Apply the 3 configuration files created in Lessons 188, 189, & 191 to the cluster,
+	
+	> This is being done to check for any obvious syntax errors in the files.
+	
+	
+	> Also, the pods may not run correctly because the Redis and Postgres environment variables have not been added to the configuration. This will be done later.
+
+
+		kubectl apply -f k8s 
+	
+* Executing
+
+		kubectl get pods
+	
+	shows the number of pods that we have,
+	
+		NAME                                 READY   STATUS    RESTARTS   AGE
+		client-deployment-6dd64ffd7-24bgn    1/1     Running   0          21h
+		client-deployment-6dd64ffd7-f258j    1/1     Running   0          21h
+		client-deployment-6dd64ffd7-mtmsm    1/1     Running   0          21h
+		server-deployment-5f6466b8f6-2fkck   1/1     Running   0          3m
+		server-deployment-5f6466b8f6-gmmbn   1/1     Running   0          3m
+		server-deployment-5f6466b8f6-q9886   1/1     Running   0          3m
+		worker-deployment-5cd7f9d8ff-59bvh   1/1     Running   0          3m
+	
+* Executing 
+
+		kubectl get deployments
+		
+	shows the number of deployments as a result of adding the new configurations,
+	
+		NAME                DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
+		client-deployment   3         3         3            3           21h
+		server-deployment   3         3         3            3           5m
+		worker-deployment   1         1         1            1           5m
+		
+* Executing
+
+		kubectl get services
+		
+	shows the network services for the **client** and **worker**,
+	
+		NAME                        TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)    AGE
+		client-cluster-ip-service   ClusterIP   10.96.45.139    <none>        3000/TCP   21h
+		kubernetes                  ClusterIP   10.96.0.1       <none>        443/TCP    52d
+		server-cluster-ip-service   ClusterIP   10.105.80.248   <none>        5000/TCP   6m
+
+* The logs can also be examined as we like for additional information on what is going on in the pods, e.g.
+
+		kubectl logs server-deployment-5f6466b8f6-2fkck
+		
+	returns 
+	
+		> @ start /app
+		> node index.js
+
+		Listening
+		{ Error: connect ECONNREFUSED 127.0.0.1:5432
+		    at TCPConnectWrap.afterConnect [as oncomplete] (net.js:1117:14)
+		  errno: 'ECONNREFUSED',
+		  code: 'ECONNREFUSED',
+		  syscall: 'connect',
+		  address: '127.0.0.1',
+		  port: 5432 }
+		  
+	This tells the following, (which is expected),
+	* **nodeJS** was executed (the default **npm** command)
+	* The **connection error** is because there is currently no copy of **Redis** available.
+	* Port **5432** was used as the default port, (from Redis).
+
+#### Lesson 193
+
+Create the **Redis** and associated **ClusterIP** service configuration files,
+
+* **redis-deployment.yaml**
+* **redis-cluster-ip-service.yaml**
+
+> Review the contents of the **redis-deployment.yaml** and **redis-cluster-ip-service.yaml** for details on how the service is configured.
+
+#### Lesson 194
+
+Create the Postgres and associated ClusterIP service configuration files,
+
+* postgres-deployment.yaml
+* postgres-cluster-ip-service.yaml
+
+> Review the contents of the postgres-deployment.yaml and postgres-cluster-ip-service.yaml for details on how the service is configured.

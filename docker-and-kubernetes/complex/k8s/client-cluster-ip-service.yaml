@@ -7,12 +7,12 @@ spec:
   selector:
     component: web        # This has to match the selector component in
                           # client-deployment.yaml.
-    ports:
-    # NOTE: port and targetPort are both set to 3000 for this scenario.
-    # there could be reasons why port redirection would be needed.
-      - port: 3000        # This is used by other pods that need access to
-                          # the clent.
-        targetPort: 3000  # All incoming traffic is directed to this port
-                          # inside the pod. In this case, 3000 has been mapped
-                          # to the multi-client container in 
-                          # client-deployment.yaml.
+  ports:
+  # NOTE: port and targetPort are both set to 3000 for this scenario.
+  # there could be reasons why port redirection would be needed.
+    - port: 3000        # This is used by other pods that need access to
+                        # the clent.
+      targetPort: 3000  # All incoming traffic is directed to this port
+                        # inside the pod. In this case, 3000 has been mapped
+                        # to the multi-client container in 
+                        # client-deployment.yaml.

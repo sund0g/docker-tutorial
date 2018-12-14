@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-deployment
+spec:           # Specify how the deployment behaves.
+  replicas: 1   # Not providing Postgres cluster HA in this course.
+  selector:
+    matchLabels:
+      component: postgres
+  template:     # Pod template
+    metadata:
+      labels:
+        component: postgres
+    spec:       # Pod sepcifications
+      containers:
+        - name: postgres
+          image: postgres
+          ports:
+            - containerPort: 5432 # Using default
