@@ -11,7 +11,7 @@
 
 The objectives for **sections 8 and 9** of the course are,
 
-1. Take the lessons learned in section 7 and create multiple containters which can be modularly and easily maintained.
+1. Take the lessons learned in section 7 and create multiple containers which can be modularly and easily maintained.
 2. Create an overly-complicated React application which will be containerized. The reason for the complicated design allows us to learn how to create and support multiple containers for an application, (all of Section 8).
 3. Learn about **HTML5 [PushState](https://developer.mozilla.org/en-US/docs/Web/API/History_API) routing**. This does require some basic knowledge of [React Router](https://reacttraining.com/react-router/)
 4. Create **Development-only** Dockerfiles for the **React app**, **Express Server**, and  **Worker** components, (lessons 110-112)
@@ -159,7 +159,7 @@ The architecture will look like,
 * Before creating the additional configuration files, the existing ones will be tested to ensure they are correct.
 * This will be done by loading both configurations into the cluster via **kubectl**.
 
--
+--
 
 * Before doing this, delete the deployment created in previous lessons as follows,
 
@@ -189,7 +189,7 @@ The architecture will look like,
 		
 	> Executing **kubectl get services** should return only the kubernetes service which is required for kubernetes to run on the system.
 
--
+--
 
 Once everything is cleaned up, deploy the configuration files by executing,
 
@@ -263,7 +263,7 @@ Create the **Express API/multi-server** and associated **ClusterIP** service con
 
 		---
 		
-	However, this may be a bit confusing for maintenance. It is left to personal preference as to which model to follow. I am fiollowing the **keep everything in separate files** model as presented in the course
+	However, this may be a bit confusing for maintenance. It is left to personal preference as to which model to follow. I am following the **keep everything in separate files** model as presented in the course
 
 #### Lesson 191
 
