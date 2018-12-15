@@ -129,7 +129,7 @@ The architecture will look like,
 	1. Create a **k8s** subdir in the **complex** dir
 	2. Create **client-deployment.yaml** in the **k8s** directory
 
-	> Review the contents of the **client-deployment.yaml** for details on how the deployment is configured.
+	> Review the contents of **client-deployment.yaml** for details on how the deployment is configured.
 
 #### Lessons 185 & 186
 
@@ -152,14 +152,14 @@ The architecture will look like,
 
 1. Create **client-cluster-ip-service.yaml** in the **k8s** directory.
 
-> Review the contents of the **client-cluster-ip-service.yaml** for details on how the service is configured.
+> Review the contents of **client-cluster-ip-service.yaml** for details on how the service is configured.
 
 #### Lesson 187
 
 * Before creating the additional configuration files, the existing ones will be tested to ensure they are correct.
 * This will be done by loading both configurations into the cluster via **kubectl**.
 
---
+---
 
 * Before doing this, delete the deployment created in previous lessons as follows,
 
@@ -189,7 +189,7 @@ The architecture will look like,
 		
 	> Executing **kubectl get services** should return only the kubernetes service which is required for kubernetes to run on the system.
 
---
+---
 
 Once everything is cleaned up, deploy the configuration files by executing,
 
@@ -245,7 +245,7 @@ Create the **Express API/multi-server** and associated **ClusterIP** service con
 * **server-deployment.yaml**
 * **server-cluster-ip-service.yaml**
 
-> Review the contents of the **server-deployment.yaml** and **server-cluster-ip-service.yaml** for details on how the service is configured.
+> Review the contents of **server-deployment.yaml** and **server-cluster-ip-service.yaml** for details on how the service is configured.
 
 > Remember port 5000 was hardcoded into the server **index.js** file,
 
@@ -269,7 +269,7 @@ Create the **Express API/multi-server** and associated **ClusterIP** service con
 
 Create the **worker-deployment.yaml** configuration.
 
-> Review the contents of the **worker-deployment.yaml** for details on how the service is configured.
+> Review the contents of **worker-deployment.yaml** for details on how the service is configured.
 
 #### Lesson 192
 
@@ -350,7 +350,7 @@ Create the **Redis** and associated **ClusterIP** service configuration files,
 * **redis-deployment.yaml**
 * **redis-cluster-ip-service.yaml**
 
-> Review the contents of the **redis-deployment.yaml** and **redis-cluster-ip-service.yaml** for details on how the service is configured.
+> Review the contents of **redis-deployment.yaml** and **redis-cluster-ip-service.yaml** for details on how the service is configured.
 
 #### Lesson 194
 
@@ -359,4 +359,138 @@ Create the Postgres and associated ClusterIP service configuration files,
 * postgres-deployment.yaml
 * postgres-cluster-ip-service.yaml
 
-> Review the contents of the postgres-deployment.yaml and postgres-cluster-ip-service.yaml for details on how the service is configured.
+> Review the contents of **postgres-deployment.yaml** and **postgres-cluster-ip-service.yaml** for details on how the service is configured.
+
+#### Lesson 195
+
+A quick review on what a **volume** is and why it's needed for **Postgres**.
+
+* When **volumes** were used in previous **Docker** lessons, it was so that code updates could be written to a volume and show up in the **container**.
+* With **Postgres** it is the other way around; **write requests** will be sent to the volume instead of the the local storage inside the container. 
+
+	This is so that when the pod is recreated, the data will persist.
+	
+> **NOTE on multiple database pods: Simply changing the number of database instances in a k8s cluster that point to the same volume will not work. If a database needs to be scaled up, there are additional, safe methods for doing that. This is not particular to k8s; it is a database architecture thing.**
+
+#### Lesson 196 & 197
+
+In **k8s** it is critical to know the following about **volumes**
+
+**Definition of Volume** 
+
+* **Docker**: Some type of mechanism that allows a container to access a filesystem outside of itself.
+* **Kubernetes**: An **object** that allows a container to store data **at the pod level**, i.e. the storage is inside the pod.
+
+When **persistent data** is required, a **volume** will not be used because its lifecycle is the **same as the pod on which it resides.**
+
+The following two **k8s objects** are what should be used for persistent data,
+
+* **Persistent Volume Claim**
+* **Persistent Volume**
+
+> **k8s Volumes** are not used as part of this course.
+
+Storage for a **Persistent Volume** is outside the pod.
+
+#### Lesson 198
+
+> **GOAL**: learn the difference between **Persistent Volume** and **Persistent Volume Claim**
+
+* A **Persistent Volume Claim** is analagous to an **advertisment**. In **k8s**, configuration files are created such that the **PVC** is *advertised* as available to other objects.
+
+* There are **two** types of **Persistent Volumes**
+	* **Statically** provisioned
+		* Created ahead of when needed.
+		* Can be used immediately
+	* **Dynaimcally** provisioned
+		* Created only when specified in a **configuration**
+
+#### Lessons 199, 200, & 201
+
+> **GOAL**: Create a **Persistent Volume Claim**
+
+> Remember, a **PVC** is not an actual instance of storage. It is something that is attached to a **pod config**.
+
+* Create the **claim database-persistent-volume-claim.yaml**
+
+> Review the contents of **database-persistent-volume-claim.yaml** for details on how the **PersistentVolumeClaim** is configured.
+
+* There are **three** types of **Access Modes**
+	* **ReadWriteOnce**: Can be used by a **single** node.
+	* **ReadOnlyMany**: **Mulitple** nodes can **read**
+	* **ReadWriteMany**: Can be **read** from and **written** to by **many** nodes.
+
+* **By default**, k8s **creates** persistent volumes on the **local computer**
+
+* To see where storage is being allocated onm the local computer,
+
+		kubectl get StorageClass
+		
+	returns something like,
+	
+		NAME                 PROVISIONER                AGE
+		standard (default)   k8s.io/minikube-hostpath   53d
+		
+* Executing
+
+		kubectl describe StorageClass
+		
+	returns additional information,
+	
+		Name:            standard
+		IsDefaultClass:  Yes
+		Annotations:     kubectl.kubernetes.io/last-applied-configuration={"apiVersion":"storage.k8s.io/v1","kind":"StorageClass","metadata":{"annotations":{"storageclass.beta.kubernetes.io/is-default-class":"true"},"labels":{"addonmanager.kubernetes.io/mode":"Reconcile"},"name":"standard","namespace":""},"provisioner":"k8s.io/minikube-hostpath"}
+		,storageclass.beta.kubernetes.io/is-default-class=true
+		Provisioner:           k8s.io/minikube-hostpath
+		Parameters:            <none>
+		AllowVolumeExpansion:  <unset>
+		MountOptions:          <none>
+		ReclaimPolicy:         Delete
+		VolumeBindingMode:     Immediate
+		Events:                <none 
+		
+	**minikube-hostpath** identifies the storage path as being part of the **minikube** environment on the local computer.
+	
+* This sounds fairly simple and it is until the configuration is migrated to a **cloud provider** where there are **multiple provisioners**.
+
+> For examples of **provisioners**, refer to the [k8s Storage Classes documentation](https://kubernetes.io/docs/concepts/storage/storage-classes/#provisioner)
+
+#### Lessons 202 & 203
+
+* Now that there is a better iunderstanding of **PVCs** let's look at how to **designate** one in a **pod template**
+
+1. Add the **Claim** to **postgres-deployment.yaml**
+
+	> Review the contents of **postgres-deployment.yaml** for details on how the **PersistentVolumeClaim** is attached to the **pod config**.
+
+2. Deploy the updated **postgres** configuration files,
+
+		kubectl apply -f k8s
+		
+	> Execute the **kubectl** *get* commands, (pods, deployment, et al) to verify the pods and services were deployed.
+	
+3. Execute
+
+		kubectl get pv
+		
+	to get the details of the **Persistent Volume**
+	
+		NAME                                       CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS   CLAIM                                      STORAGECLASS   REASON   AGE
+		pvc-ce8c9cb6-0010-11e9-9053-080027ce12f1   2Gi        RWO            Delete           Bound    default/database-persistent-volume-claim   standard                9m
+
+	**Bound** means the volume is bound to the pod.
+	
+4. Execute,
+	
+		kubectl get pvc
+		
+	to list out the **Persistent Volume Claims/Advertisements** 
+	
+		NAME                               STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   AGE
+		database-persistent-volume-claim   Bound    pvc-ce8c9cb6-0010-11e9-9053-080027ce12f1   2Gi        RWO            standard       11m
+
+> At this point, if the Postgres pod is deleted, the data in the **Persistent Volume** should remain. This will be tested in subsequent lessons.
+
+#### Lessons 204 & 205
+
+* One of the final configuration steps is to add the **Redis** and **Postgres** environment variables so the **server** and **worker** pods can communicate with the **databases**.
