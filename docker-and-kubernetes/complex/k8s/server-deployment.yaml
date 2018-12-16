@@ -18,3 +18,18 @@ spec:                     # define deployment behavior
             image: sund0g/multi-server
             ports:
               - containerPort: 5000
+            env:
+              - name: REDIS_HOST
+                value: redis-cluster-ip-service
+              - name: REDIS_PORT
+                value: 6379
+              - name: PGUSER
+                value: postgres # Using the default username. This should be
+                                # changed if a production deployment.
+              - name: PGHOST
+                value: postgres-cluster-ip-service
+              - name: PGPORT
+                value: 5432
+              - name: PGDATABASE
+                value: postgres # Using the default db name. This should be
+                                # changed if a production deployment.

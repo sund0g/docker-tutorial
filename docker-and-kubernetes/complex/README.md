@@ -494,3 +494,83 @@ Storage for a **Persistent Volume** is outside the pod.
 #### Lessons 204 & 205
 
 * One of the final configuration steps is to add the **Redis** and **Postgres** environment variables so the **server** and **worker** pods can communicate with the **databases**.
+	
+	> **Environment variables** are placed in the **container spec section** as an array with the section name of **env:**
+	
+	The variables that will be added are the same as with **docker-compose**,
+	
+	* REDIS_HOST
+	* REDIS_PORT
+	* PGUSER
+	* PGHOST
+	* PGDATABASE
+	* PGPORT
+	* PGPASSWORD
+
+1. Add
+	* **REDIS_HOST** 
+	* **REDIS_PORT** 
+	
+	to **worker-deployment.yaml** *it needs to communicate with the Redis database.*
+
+2. Add
+	* **REDIS_HOST** 
+	* **REDIS_PORT**
+	* **PGUSER**
+	* **PGHOST**
+	* **PGPORT**
+	* **PGDATABASE**
+
+	to **server-deployment.yaml** *It needs to communicate with both the Redis and Postgres databases.*
+	
+#### Lesson 206
+
+* Setting the **Postgres password** is what provides access to the **database**. 
+
+### NOTE
+---
+
+**Passwords** should **NEVER** be set in clear text in any file. They should be created as **secrets** which can then be used in a secure manner.
+
+---
+
+* **k8s** provides a [**secret** object](https://kubernetes.io/docs/concepts/configuration/secret/) to provide this functionality. **Secrets** securely store pieces of information in the cluster such as,
+
+	* **passwords**
+	* **API keys**
+	* **SSH keys**
+	* any type of data that should not be easily exposed to the outside world.
+
+* As a general rule, **objects** are created with a **configuration file**. However, with **secrets** an **Imperative command** is used to generate the **secret** object.
+
+	> Because an **Imperative command** is used to create the **secret** it must be **manually executed** in the environment in which it is to be used.
+
+* To create a **secret** that **k8s** can use,
+
+		kubectl create secret generic pgpassword --from-literal PGPASSWORD=drowssap54321
+		
+	returns
+	
+		secret/pgpassword created
+		
+	> **create secret** can create 3 types of secrets,
+	> 
+	> * **generic**: used for general passwords and keys
+	> * **docker-registry**: used for custom Docker registries, (such as privately hosted). 
+	> * **tls**: Used for HTTPS
+
+* To examine to secret
+
+		kubectl get secrets
+		
+	returns
+	
+		NAME                  TYPE                                  DATA   AGE
+		default-token-txgp9   kubernetes.io/service-account-token   3      54d
+		pgpassword            Opaque                                1      1m
+
+	This tells us the **pgpassword** secret has one (**DATA**) key/value pair associated with it. This pair is the key/value that was entered in the **kubectl create secret** command above.
+	
+#### Lesson 207
+
+

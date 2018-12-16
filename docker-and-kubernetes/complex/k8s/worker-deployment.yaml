@@ -19,6 +19,11 @@ spec:
       containers:
         - name: worker
           image: sund0g/multi-worker
+          env:      # container environment variables
+            - name: REDIS_HOST
+              value: redis-cluster-ip-service
+            - name: REDIS_PORT
+              value: 6379
 
 # There are no ports or services associated with the worker because 
 # there are no outside requests routing to it.
