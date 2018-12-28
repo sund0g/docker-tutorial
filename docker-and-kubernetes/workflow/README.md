@@ -1,4 +1,4 @@
-## Creating a Production-Grade Workflow
+## Section 6: Creating a Production-Grade Workflow
 
 The objectives for this section are,
 

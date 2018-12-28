@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-deployment
+spec:           # Specify how the deployment behaves.
+  replicas: 1   # Not providing Postgres cluster HA in this course.
+  selector:
+    matchLabels:
+      component: postgres
+  template:     # Pod template
+    metadata:
+      labels:
+        component: postgres
+    spec:       # Pod sepcifications
+      volumes:  # This section is what attaches the PVC to the pod config.
+                # All this does is allocate the storage. To assign the storage
+                # for use by the containers, see the volumeMounts section 
+                # below.
+        - name: postgres-storage
+          persistentVolumeClaim:
+            claimName: database-persistent-volume-claim
+      containers:
+        - name: postgres
+          image: postgres
+          ports:
+            - containerPort: 5432 # Using default
+          volumeMounts:
+            - name: postgres-storage              # This has to be identical 
+                                                  # to the spec volume name
+                                                  # above.
+              mountPath: /var/lib/postgresql/data # Where inside the container 
+                                                  # the storage is to be made 
+                                                  # available. Using the
+                                                  # default PS data path.
+              subPath: postgres # SubPath is not needed for a normal mount
+                                # point. What this does is take the data in the
+                                # mountPath and put it in a sub-folder of the
+                                # name subPath in the persistent volume.
+          env: 
+            - name: PGPASSWORD  # This overrides the default password.
+              valueFrom:
+                secretKeyRef:
+                  name: pgpassword  # This is the name of the secret
+                  key: PGPASSWORD # This is not related to the env var name
+                                  # above.

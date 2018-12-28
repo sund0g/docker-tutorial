@@ -1,4 +1,4 @@
-## Docker Compose with Multiple Local Containers
+## Section 5: Docker Compose with Multiple Local Containers
 
 The objectives for this section are,
 

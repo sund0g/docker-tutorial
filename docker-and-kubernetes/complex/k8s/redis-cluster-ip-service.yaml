@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-cluster-ip-service
+spec:
+  type: ClusterIP
+  selector:
+    component: redis
+  ports:
+    - port: 6379        # All outside object requests go here.
+      targetPort: 6379  # Using the same port for traffic inside the container.

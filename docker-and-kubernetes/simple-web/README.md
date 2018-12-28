@@ -1,4 +1,4 @@
-## Making Real Projects with Docker
+## Section 4: Making Real Projects with Docker
 
 The objective for this section is,
 

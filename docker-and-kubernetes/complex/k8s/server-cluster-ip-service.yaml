@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: server-cluster-ip-service
+spec:
+  type: ClusterIP
+  selector:
+    component: server
+  ports:
+    - port: 5000        # This is used by other pods that need access to
+                        # the clent.
+                        #
+                        # Remember, 5000 is hardcoded into the server's
+                        # index.js.
+                        #
+      targetPort: 5000  # All incoming traffic is directed to this port
+                        # inside the pod. In this case, 5000 has been mapped
+                        # to the multi-client container in 
+                        # server-deployment.yaml.
