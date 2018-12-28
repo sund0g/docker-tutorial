@@ -22,14 +22,24 @@ spec:                     # define deployment behavior
               - name: REDIS_HOST
                 value: redis-cluster-ip-service
               - name: REDIS_PORT
-                value: 6379
+                value: '6379'
               - name: PGUSER
-                value: postgres # Using the default username. This should be
-                                # changed if a production deployment.
+                value: postgres   # Using the default username. This should be
+                                  # changed if a production deployment.
               - name: PGHOST
                 value: postgres-cluster-ip-service
               - name: PGPORT
-                value: 5432
+                value: '5432'
               - name: PGDATABASE
-                value: postgres # Using the default db name. This should be
-                                # changed if a production deployment.
+                value: postgres   # Using the default db name. This should be
+                                  # changed if a production deployment.
+              - name: PGPASSWORD  # This name is not related to the secret,
+                                  # it can be anything. Our copy of the multi-
+                                  # server image is looking for "PGPASSWORD"
+                                  # This name is what will show up inside
+                                  # the container.
+                valueFrom:
+                  secretKeyRef: 
+                    name: pgpassword  # This is the name of the secret.
+                    key: PGPASSWORD # This is not relate to the name above.
+                                    # It is coincidence they are named the same.

@@ -573,4 +573,43 @@ Storage for a **Persistent Volume** is outside the pod.
 	
 #### Lesson 207
 
+* To add the Postgres secret created in the previous lesson to the **server-deployment.yaml** and **postgres-deployment.yaml** files as **environment variables**
+
+* Adding the secret to **server-deployment.yaml** tells the **server** what the password is.
+
+* Adding the secret to **postgres-deployment.yaml** tells the database what password to use anytime a connection is made to it.
+
+
+	> Review the contents of **server-deployment.yaml** and **postgres-deployment.yaml** for details on how the password secret is added to the deployments. 
+	
+* To apply the changes execute,
+
+		kubectl apply -f k8s
+		
+#### Lesson 208	
+
+* when the configuration changes were applied in the previous lesson, the following error was returned,
+	
+		...
+		"k8s/worker-deployment.yaml": cannot convert int64 to string
+		
+	This has nothing to do with the secrets, rather the port numbers that were added as integers.
+	
+* This is because **environment variable values** must be provided as **strings**.
+
+* To fix the errors add **single quotes** around all integer instances of the **port numbers**, e.g.
+
+		value: 6379 changes to 
+		value: '6379'
+		
+* executing `kubectl apply -f k8s` after the changes should rectify the errors
+
+### Takeaway
+---
+
+**environment variable values** must be provided as **strings**.
+
+---
+	
+
 

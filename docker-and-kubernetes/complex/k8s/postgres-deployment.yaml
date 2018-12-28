@@ -36,3 +36,10 @@ spec:           # Specify how the deployment behaves.
                                 # point. What this does is take the data in the
                                 # mountPath and put it in a sub-folder of the
                                 # name subPath in the persistent volume.
+          env: 
+            - name: PGPASSWORD  # This overrides the default password.
+              valueFrom:
+                secretKeyRef:
+                  name: pgpassword  # This is the name of the secret
+                  key: PGPASSWORD # This is not related to the env var name
+                                  # above.
