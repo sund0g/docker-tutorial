@@ -714,4 +714,43 @@ Looking behind the scenes at what will happen when we deploy **nginx** to **GCP*
 	>	* if the request has a path of '**/api**', route to the **server**
 
 	1. Create **ingress-service.yaml** in the **k8s** directory.
-	2. 
+
+	> Review the contents of **ingress-service.yaml** for details on how the service is configured.
+	>
+	> Not going into a lot of detail on the spec section now, that will come later.
+	
+	2. Deploying the networking rules just created,
+
+			kubectl apply -f k8s
+			
+		should return
+		
+			ingress.extensions/ingress-service created
+			
+#### Lesson 219
+
+* To test the Ingress locally,
+
+	1. Get the IP of **minikube**
+		
+			minikube ip
+			
+	2. enter the returned IP into a browser window and verify the Fibonacci app functions correctly.
+
+	> No ports are needed on the end of the IP address this time; the **Ingress controller** created in the previous lessons is autimatically listening on ports **80** and **443**.
+	
+	> Also the **"not safe"** message will only happen in the local environment. When the the application is pushed to Production in the next section, this will be addressed.
+	
+#### Lesson 220
+
+* At this point, it is time to learn about the **minikube dashboard** to start the dashboard execute,
+
+		minikube dashboard
+		
+	this will open the dashboard in the dafault browser.
+	
+	> **Replica Sets** and **Replication Controllers** are being deprecated in favor of **Deployments**.
+	
+* While changes *can* be made inside the dashboard, these are **Imperative** and are not recommended.
+
+	> Explore the dashboard; it is useful for examining the status of the cluster.
