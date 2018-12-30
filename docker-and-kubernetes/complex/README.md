@@ -3,6 +3,7 @@
 * [Section 8: Building a Multi-Container Application](#89)
 * [Section 9: "Dockerizing" Multiple Services](#89)
 * [Section 14: A Multi-Container App with Kubernetes](#14)
+* [Section 15: Handling Traffic with Ingress Controllers](#15)
 
 ---
 
@@ -396,13 +397,13 @@ Storage for a **Persistent Volume** is outside the pod.
 
 > **GOAL**: learn the difference between **Persistent Volume** and **Persistent Volume Claim**
 
-* A **Persistent Volume Claim** is analagous to an **advertisment**. In **k8s**, configuration files are created such that the **PVC** is *advertised* as available to other objects.
+* A **Persistent Volume Claim** is analogous to an **advertisement**. In **k8s**, configuration files are created such that the **PVC** is *advertised* as available to other objects.
 
 * There are **two** types of **Persistent Volumes**
 	* **Statically** provisioned
 		* Created ahead of when needed.
 		* Can be used immediately
-	* **Dynaimcally** provisioned
+	* **Dynamically** provisioned
 		* Created only when specified in a **configuration**
 
 #### Lessons 199, 200, & 201
@@ -417,12 +418,12 @@ Storage for a **Persistent Volume** is outside the pod.
 
 * There are **three** types of **Access Modes**
 	* **ReadWriteOnce**: Can be used by a **single** node.
-	* **ReadOnlyMany**: **Mulitple** nodes can **read**
+	* **ReadOnlyMany**: **Multiple** nodes can **read**
 	* **ReadWriteMany**: Can be **read** from and **written** to by **many** nodes.
 
 * **By default**, k8s **creates** persistent volumes on the **local computer**
 
-* To see where storage is being allocated onm the local computer,
+* To see where storage is being allocated on the local computer,
 
 		kubectl get StorageClass
 		
@@ -457,7 +458,7 @@ Storage for a **Persistent Volume** is outside the pod.
 
 #### Lessons 202 & 203
 
-* Now that there is a better iunderstanding of **PVCs** let's look at how to **designate** one in a **pod template**
+* Now that there is a better understanding of **PVCs** let's look at how to **designate** one in a **pod template**
 
 1. Add the **Claim** to **postgres-deployment.yaml**
 
@@ -571,7 +572,7 @@ Storage for a **Persistent Volume** is outside the pod.
 
 	This tells us the **pgpassword** secret has one (**DATA**) key/value pair associated with it. This pair is the key/value that was entered in the **kubectl create secret** command above.
 	
-#### Lesson 207
+#### Lessons 207, 208, & 209
 
 * To add the Postgres secret created in the previous lesson to the **server-deployment.yaml** and **postgres-deployment.yaml** files as **environment variables**
 
@@ -586,7 +587,7 @@ Storage for a **Persistent Volume** is outside the pod.
 
 		kubectl apply -f k8s
 		
-#### Lesson 208	
+#### Lesson 210	
 
 * when the configuration changes were applied in the previous lesson, the following error was returned,
 	
@@ -610,6 +611,146 @@ Storage for a **Persistent Volume** is outside the pod.
 **environment variable values** must be provided as **strings**.
 
 ---
+
+<a name="15"></a>
+## Section 15: Handling Traffic with Ingress Controllers
+
+#### Lesson 211
+
+* Thus far **NodePort** and **ClusterIP** have been discussed. Before addressing **Ingress**, we will discuss the **LoadBalancer** service and why it will not be used as part of this course.
+
+* The **LoadBalancer** service is the legacy object for getting **outside network traffic** into a **cluster**. It does **two** separate things,
+
+	1. Provides access to a **single set of pods**. The **complex** application requires outside access to **multi-client** and **multi-server** pods, so the LoadBalancer service will not work for this application. 
+	2. **k8s** connects with the **Cloud provider** and provisions a **classic Load Balancer** and automatically configures it to send traffic to the **LoadBalancer** service.
+
+> The **Ingress** service is considered the **modern** approach to directing traffic into a cluster.
+
+#### Lesson 212
+
+* **k8s** leverages several implementations of an **Ingress** service. This course will focus on the **nginx** implementation only.
+
+> **IMPORTANT** This course uses the **[ingress-nginx](https://github.com/kubernetes/ingress-nginx)** community led project, **NOT** the **[kubernetes-nginx](https://github.com/nginxinc/kubernetes-ingress)** project led by the company **[nginx](https://www.nginx.com/)**.
+
+#### Lesson 213
+
+* The setup of **nginx-ingress** varies depending on the environment, (**local, GCP, AWS, Azure**). This course utilizes the **local** and **GCP** environments, and so the nginx-ingress setup will be specific to them.
+
+#### Lesson 214
+
+* The **Ingress** service is a **controller** object, just like the **Deployment** object, i.e. it the **Ingress configuration file** defines a set of **routing rules** and their **desired state** for which **kubectl** will create an **Ingress controller** object that constantly maintains the **desired state**.
+
+> When **kubectl** processes the Ingress **configuration file**, it will create a **pod** running **nginx**.
+
+* To recap, there are **three** separate components that comprise the **Ingress** service,
+
+	1. **Ingress configuration file**: contains the set of rules describing how traffic is to be routed.
+	2. **Ingress Controller**: object that watches for changes to the **configuration** and updates the *infrastructure*.
+	3. **Infrastructure**: the *thing* that actually handles the traffic.
+
+	> For the **[ingress-nginx](https://github.com/kubernetes/ingress-nginx)** implementation used for this course, the **Ingress Controller** and **Infrastructure** are combined into a single object.
 	
+#### Lessons 215 & 216
 
+Looking behind the scenes at what will happen when we deploy **nginx** to **GCP**,
 
+* The **Ingress Configuration** is fed into a **Deployment** consisting of a **nginx controller** and a **nginx pod**.
+* An instance of a **[GCP Load Balancer](https://cloud.google.com/load-balancing/)** object will be created that directs traffic to our cluster.
+* The **nginx controller/pod** deployment will also get a **LoadBalancer** service attached to it.
+
+	> This is the same **LoadBalancer** service described in **Lesson 211**. Even though we said we should not be specifically using this legacy service, it **is** still used behind the scenes when deploying in **GCP**.
+	
+	> This would be unknown to us unless we examined the source code that sets up Ingress in **GCP**.
+
+* A **default-backend** deployment is set up inside the cluster. This is used for a series of **health-checks** to ensure the cluster is performing as expected.
+
+	> Ideally the default-backend pod would be replaced with the **ExpressAPI/multi-server pod(s)**.
+	
+	> This will be explained later, but for now, be aware that the **default-backend** will be used for this course.
+
+### Takeaways
+---
+
+1. The reason **[ingress-nginx](https://github.com/kubernetes/ingress-nginx)** is being used instead of just using a **custom** nginx, (like in previous sections) is that there is logic built into **[ingress-nginx](https://github.com/kubernetes/ingress-nginx)** that bypasses the **ClusterIP** service and sends requests to a specific pod, emulating **[sticky sessions](http://wiki.metawerx.net/wiki/StickySessions)**. There are other reasons as well that are not discussed here.
+
+2. For a deeper dive into **ingress-nginx** check out **[Studying the Kubernetes Ingress system](https://www.joyfulbikeshedding.com/blog/2018-03-26-studying-the-kubernetes-ingress-system.html)**
+
+---
+
+#### Lesson 217
+
+* To start setting up **[ingress-nginx](https://github.com/kubernetes/ingress-nginx)** for the **Complex** project, the directions in the **[GitHub repo](https://github.com/kubernetes/ingress-nginx)** will be followed,
+
+	1. Navigate to the **[repo](https://github.com/kubernetes/ingress-nginx)**.
+	2. Select the **[NGINX Ingress Controller for Kubernetes](https://kubernetes.github.io/ingress-nginx/)** documentation link.
+	3. Select the **[Deployment](https://kubernetes.github.io/ingress-nginx/deploy/)** tab at the top.
+	4. Select the **[Prerequisite Generic Deployment Command](https://kubernetes.github.io/ingress-nginx/deploy/#prerequisite-generic-deployment-command)**
+	5. Execute the command, (this must be done for all environments),
+	
+			kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/mandatory.yaml
+			
+		> To see the specifics of what is happening, examine the yaml file by entering it into a browser window,
+	
+			https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/mandatory.yaml
+			
+		> If we wanted to use our own healthchecks instead of the **default-backend**, we would follow the 2 steps in the **default-http-backend** configuration.
+	
+	6. Select **[minikube](https://kubernetes.github.io/ingress-nginx/deploy/#minikube)** Set up the **local** environment.
+	7. Copy and execute the command for standard usage,
+
+			minikube addons enable ingress
+			 
+		should return,
+		
+			ingress was successfully enabled
+			
+#### Lesson 218
+
+* To create the **routing rules** for use inside the **complex** application,
+
+	> The rules created as part of the **Elastic Beanstalk** project in **Section 7** will be reused here, i.e.
+	
+	>	* if the request has a path of '**/**', route to the **client**
+	>	* if the request has a path of '**/api**', route to the **server**
+
+	1. Create **ingress-service.yaml** in the **k8s** directory.
+
+	> Review the contents of **ingress-service.yaml** for details on how the service is configured.
+	>
+	> Not going into a lot of detail on the spec section now, that will come later.
+	
+	2. Deploying the networking rules just created,
+
+			kubectl apply -f k8s
+			
+		should return
+		
+			ingress.extensions/ingress-service created
+			
+#### Lesson 219
+
+* To test the Ingress locally,
+
+	1. Get the IP of **minikube**
+		
+			minikube ip
+			
+	2. enter the returned IP into a browser window and verify the Fibonacci app functions correctly.
+
+	> No ports are needed on the end of the IP address this time; the **Ingress controller** created in the previous lessons is autimatically listening on ports **80** and **443**.
+	
+	> Also the **"not safe"** message will only happen in the local environment. When the the application is pushed to Production in the next section, this will be addressed.
+	
+#### Lesson 220
+
+* At this point, it is time to learn about the **minikube dashboard** to start the dashboard execute,
+
+		minikube dashboard
+		
+	this will open the dashboard in the dafault browser.
+	
+	> **Replica Sets** and **Replication Controllers** are being deprecated in favor of **Deployments**.
+	
+* While changes *can* be made inside the dashboard, these are **Imperative** and are not recommended.
+
+	> Explore the dashboard; it is useful for examining the status of the cluster.
