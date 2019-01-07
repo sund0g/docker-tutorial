@@ -56,7 +56,7 @@ This lesson requires some additional setup as follows below. **NOTE:** we will b
 
 * **Notes for Sections 10 and 11 are in the [multi-docker](https://github.com/sund0g/multi-docker) README.md**
 
-* **Notes for Sections 12 and 13 are in the ["simple-k8s"](https://github.com/sund0g/docker-tutorials/tree/master/docker-and-kubernetes/simple-k8s) README.md**
+* **Notes for Sections 12 and 13 are in the [simple-k8s](https://github.com/sund0g/docker-tutorials/tree/master/docker-and-kubernetes/simple-k8s) README.md**
 
 ---
 
@@ -739,7 +739,7 @@ Looking behind the scenes at what will happen when we deploy **nginx** to **GCP*
 
 	> No ports are needed on the end of the IP address this time; the **Ingress controller** created in the previous lessons is autimatically listening on ports **80** and **443**.
 	
-	> Also the **"not safe"** message will only happen in the local environment. When the the application is pushed to Production in the next section, this will be addressed.
+	> Also the **"not safe"** certificate message will only happen in the local environment. When the the application is pushed to Production in the next section, this will be addressed.
 	
 #### Lesson 220
 
@@ -747,7 +747,7 @@ Looking behind the scenes at what will happen when we deploy **nginx** to **GCP*
 
 		minikube dashboard
 		
-	this will open the dashboard in the dafault browser.
+	this will open the dashboard in the default browser.
 	
 	> **Replica Sets** and **Replication Controllers** are being deprecated in favor of **Deployments**.
 	
